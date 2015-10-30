@@ -9,6 +9,7 @@ SRCS=	main.c forkexit.c exec.c time.c alarm.c \
 	queue.c \
 	mymutex.c \
 	condition.c \
+	scheduler.c \
 
 
 DPADD+=	${LIBSYS} ${LIBTIMERS}
