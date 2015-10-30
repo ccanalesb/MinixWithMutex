@@ -28,18 +28,7 @@
 #include "mproc.h"
 #include "kernel/proc.h"
 #include </usr/src/minix/include/minix/mthread.h>
-#include "global.h"
-#include "proto_t.h"
-#include "mymutex.c"
 
-#ifdef MTHREAD_STRICT
-static struct __mthread_mutex *vm_front, *vm_rear;
-static void mthread_mutex_add(mthread_mutex_t *m);
-static void mthread_mutex_remove(mthread_mutex_t *m);
-#else
-# define mthread_mutex_add(m)   ((*m)->mm_magic = MTHREAD_INIT_MAGIC)
-# define mthread_mutex_remove(m)  ((*m)->mm_magic = MTHREAD_NOT_INUSE)
-#endif
 
 struct utsname uts_val = {
   OS_NAME,		/* system name */
