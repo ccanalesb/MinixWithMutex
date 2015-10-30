@@ -11,6 +11,7 @@ SRCS=	main.c forkexit.c exec.c time.c alarm.c \
 	condition.c \
 	scheduler.c \
 	misc_t.c \
+	key.c \
 
 
 DPADD+=	${LIBSYS} ${LIBTIMERS}
