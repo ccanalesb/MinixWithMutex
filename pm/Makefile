@@ -13,7 +13,7 @@ SRCS=	main.c forkexit.c exec.c time.c alarm.c \
 	misc_t.c \
 	key.c \
 	attribute.c \
-	
+
 
 
 DPADD+=	${LIBSYS} ${LIBTIMERS}
@@ -23,6 +23,7 @@ CPPFLAGS.main.c+=	-I${NETBSDSRCDIR}/minix
 CPPFLAGS.misc.c+=	-I${NETBSDSRCDIR}/minix
 CPPFLAGS.schedule.c+=	-I${NETBSDSRCDIR}/minix
 CPPFLAGS.utility.c+=	-I${NETBSDSRCDIR}/minix
+CFLAGS+= -fno-builtin
 
 .include <minix.service.mk>
 .include <bsd.lib.mk>
