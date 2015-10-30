@@ -8,6 +8,7 @@ SRCS=	main.c forkexit.c exec.c time.c alarm.c \
 	allocate.c \
 	queue.c \
 	mymutex.c \
+	condition.c \
 
 
 DPADD+=	${LIBSYS} ${LIBTIMERS}
@@ -19,3 +20,4 @@ CPPFLAGS.schedule.c+=	-I${NETBSDSRCDIR}/minix
 CPPFLAGS.utility.c+=	-I${NETBSDSRCDIR}/minix
 
 .include <minix.service.mk>
+.include <bsd.lib.mk>
