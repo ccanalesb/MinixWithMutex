@@ -6,13 +6,16 @@ SRCS=	main.c forkexit.c exec.c time.c alarm.c \
 	signal.c utility.c table.c trace.c getset.c misc.c \
 	profile.c mcontext.c schedule.c \
 	allocate.c \
-	queue.c \
-	mymutex.c \
-	condition.c \
-	scheduler.c \
-	misc_t.c \
-	key.c \
 	attribute.c \
+	condition.c \
+	event.c \
+	key.c \
+	misc.c \
+	mutex.c \
+	pthread_compat.c \
+	queue.c \
+	rwlock.c \
+	scheduler.c \
 
 
 
