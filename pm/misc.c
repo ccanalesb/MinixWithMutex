@@ -444,39 +444,40 @@ int do_mutex_destroy()
 /*===========================================================================*
 *	Mutex_lock						*
 *===========================================================================*/
-// int do_mutex_lock()
-// {
-// 	printf("mutex lock\n");
-// 	return 0;
+  int do_mutex_lock(mutex)
+  {
+  	mthread_mutex_lock(mutex);
+  	return 0;
 
-// }
-
-int do_mutex_lock(mutex)
-mthread_mutex_t *mutex; /* Mutex that is to be locked */
-{
-/* Try to lock this mutex. If already locked, append the current thread to
- * FIFO queue associated with this mutex and suspend the thread. */
-
-  struct __mthread_mutex *m;
-
-  if (mutex == NULL)
-    return(EINVAL);
-
-  m = (struct __mthread_mutex *) *mutex;
-  if (!mthread_mutex_valid(&m)) 
-    return(EINVAL);
-  else if (m->mm_owner == NO_THREAD) { /* Not locked */
-  m->mm_owner = current_thread;
-  } else if (m->mm_owner == current_thread) {
-    return(EDEADLK);
-  } else {
-  mthread_queue_add(&m->mm_queue, current_thread);
-  mthread_suspend(MS_MUTEX);
   }
 
-  /* When we get here we acquired the lock. */
-  return(0);
-}
+// int do_mutex_lock(mutex)
+// mthread_mutex_t *mutex; /* Mutex that is to be locked */
+// {
+// /* Try to lock this mutex. If already locked, append the current thread to
+//  * FIFO queue associated with this mutex and suspend the thread. */
+
+//   struct __mthread_mutex *m;
+
+//   if (mutex == NULL)
+//     return(EINVAL);
+
+//   m = (struct __mthread_mutex *) *mutex;
+//   if (!mthread_mutex_valid(&m)) 
+//     return(EINVAL);
+//   else if (m->mm_owner == NO_THREAD) { /* Not locked */
+//   m->mm_owner = current_thread;
+//   } else if (m->mm_owner == current_thread) {
+//     return(EDEADLK);
+//   } else {
+//   mthread_queue_add(&m->mm_queue, current_thread);
+//   mthread_suspend(MS_MUTEX);
+//   }
+
+//   /* When we get here we acquired the lock. */
+//   return(0);
+// }
+
 /*===========================================================================*
 *	Mutex_unlock							  *
 *===========================================================================*/

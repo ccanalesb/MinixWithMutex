@@ -6,17 +6,6 @@ LIB=	mthread
 SRCS=	main.c forkexit.c exec.c time.c alarm.c \
 	signal.c utility.c table.c trace.c getset.c misc.c \
 	profile.c mcontext.c schedule.c \
-	allocate.c \
-	attribute.c \
-	condition.c \
-	event.c \
-	key.c \
-	misc_t.c \
-	mutex.c \
-	pthread_compat.c \
-	queue.c \
-	rwlock.c \
-	scheduler.c \
 
 
 
@@ -27,7 +16,7 @@ CPPFLAGS.main.c+=	-I${NETBSDSRCDIR}/minix
 CPPFLAGS.misc.c+=	-I${NETBSDSRCDIR}/minix
 CPPFLAGS.schedule.c+=	-I${NETBSDSRCDIR}/minix
 CPPFLAGS.utility.c+=	-I${NETBSDSRCDIR}/minix
-CFLAGS+= -fno-builtin
+
 
 .include <minix.service.mk>
-.include <bsd.lib.mk>
+
