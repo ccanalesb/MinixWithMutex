@@ -14,10 +14,10 @@
 #include "proto.h"
 
 static int mthread_increase_thread_pool(void);
-static void mthread_thread_init(mthread_thread_t thread, mthread_attr_t
+static void mthread_thread_init(int thread, mthread_attr_t
 	*tattr, void *(*proc)(void *), void *arg);
 
-static void mthread_thread_stop(mthread_thread_t thread);
+static void mthread_thread_stop(int thread);
 static void mthread_trampoline(void);
 
 static int initialized = 0;
@@ -32,8 +32,8 @@ static struct __mthread_attr default_attr = {	MTHREAD_STACK_MIN,
  *				mthread_equal				     *
  *===========================================================================*/
 int mthread_equal(l, r)
-mthread_thread_t l;
-mthread_thread_t r;
+int l;
+int r;
 {
 /* Compare two thread ids */
 
@@ -45,13 +45,13 @@ mthread_thread_t r;
  *				mthread_create				     *
  *===========================================================================*/
 int mthread_create(threadid, tattr, proc, arg)
-mthread_thread_t *threadid;
+int *threadid;
 mthread_attr_t *tattr;
 void *(*proc)(void *);
 void *arg;
 {
 /* Register procedure proc for execution in a thread. */
-  mthread_thread_t thread;
+  int thread;
 
   if (proc == NULL)
 	return(EINVAL);
@@ -61,7 +61,7 @@ void *arg;
   	mthread_thread_init(thread, tattr, proc, arg);
  	used_threads++;
  	if(threadid != NULL) 
- 		*threadid = (mthread_thread_t) thread;
+ 		*threadid = (int) thread;
 #ifdef MDEBUG
  	printf("Inited thread %d\n", thread);
 #endif
@@ -79,7 +79,7 @@ void *arg;
  *				mthread_detach				     *
  *===========================================================================*/
 int mthread_detach(detach)
-mthread_thread_t detach;
+int detach;
 {
 /* Mark a thread as detached. Consequently, upon exit, resources allocated for
  * this thread are automatically freed.
@@ -141,7 +141,7 @@ void *value;
  *			mthread_find_tcb				     *
  *===========================================================================*/
 mthread_tcb_t * mthread_find_tcb(thread)
-mthread_thread_t thread;
+int thread;
 {
   mthread_tcb_t *rt = NULL;
 
@@ -254,7 +254,7 @@ static void __attribute__((__constructor__, __used__)) mthread_init(void)
  *				mthread_join				     *
  *===========================================================================*/
 int mthread_join(join, value)
-mthread_thread_t join;
+int join;
 void **value;
 {
 /* Wait for a thread to stop running and copy the result. */
@@ -327,7 +327,7 @@ void (*proc)(void);
 /*===========================================================================*
  *				mthread_self				     *
  *===========================================================================*/
-mthread_thread_t mthread_self(void)
+int mthread_self(void)
 {
 /* Return the thread id of the thread calling this function. */
 
@@ -339,7 +339,7 @@ mthread_thread_t mthread_self(void)
  *				mthread_thread_init			     *
  *===========================================================================*/
 static void mthread_thread_init(thread, tattr, proc, arg)
-mthread_thread_t thread;
+int thread;
 mthread_attr_t *tattr;
 void *(*proc)(void *);
 void *arg;
@@ -441,7 +441,7 @@ void *arg;
  *				mthread_thread_reset			     *
  *===========================================================================*/
 void mthread_thread_reset(thread)
-mthread_thread_t thread;
+int thread;
 {
 /* Reset the thread to its default values. Free the allocated stack space. */
 
@@ -484,7 +484,7 @@ mthread_thread_t thread;
  *				mthread_thread_stop			     *
  *===========================================================================*/
 static void mthread_thread_stop(thread)
-mthread_thread_t thread;
+int thread;
 {
 /* Stop thread from running. Deallocate resources. */
   mthread_tcb_t *stop_thread;

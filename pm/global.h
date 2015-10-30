@@ -23,7 +23,7 @@ typedef enum {
 } mthread_state_t;
 
 struct __mthread_tcb {
-  mthread_thread_t m_tid;		/* My own ID */
+  int m_tid;		/* My own ID */
   mthread_state_t m_state;		/* Thread state */
   struct __mthread_attr m_attr;		/* Thread attributes */
   struct __mthread_cond *m_cond;	/* Condition variable that this thread
@@ -39,7 +39,7 @@ struct __mthread_tcb {
 };
 typedef struct __mthread_tcb mthread_tcb_t;
 
-EXTERN mthread_thread_t current_thread;
+EXTERN int current_thread;
 EXTERN mthread_queue_t free_threads;
 EXTERN mthread_queue_t run_queue;		/* FIFO of runnable threads */
 EXTERN mthread_tcb_t **threads;

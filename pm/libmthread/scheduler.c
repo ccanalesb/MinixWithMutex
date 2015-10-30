@@ -34,7 +34,7 @@ void mthread_schedule(void)
  * first thread off the (FIFO) run queue and resuming that thread. 
  */
 
-  mthread_thread_t old_thread;
+  int old_thread;
   mthread_tcb_t *new_tcb, *old_tcb;
   ucontext_t *new_ctx, *old_ctx;
 
@@ -130,7 +130,7 @@ mthread_state_t state;
  *				mthread_unsuspend			     *
  *===========================================================================*/
 void mthread_unsuspend(thread)
-mthread_thread_t thread; /* Thread to make runnable */
+int thread; /* Thread to make runnable */
 {
 /* Mark the state of a thread runnable and add it to the run queue */
   mthread_tcb_t *tcb;
@@ -150,11 +150,11 @@ int mthread_yield(void)
 {
 /* Defer further execution of the current thread and let another thread run. */
   mthread_tcb_t *tcb;
-  mthread_thread_t t;
+  int t;
 
   /* Detached threads cannot clean themselves up. This is a perfect moment to
    * do it */
-  for (t = (mthread_thread_t) 0; need_reset > 0 && t < no_threads; t++) {
+  for (t = (int) 0; need_reset > 0 && t < no_threads; t++) {
 	tcb = mthread_find_tcb(t);
 	if (tcb->m_state == MS_NEEDRESET) {
 		mthread_thread_reset(t);

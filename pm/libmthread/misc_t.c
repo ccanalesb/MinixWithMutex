@@ -56,11 +56,11 @@ void mthread_verify_f(char *file, int line)
    * quiescent; no mutexes, conditions, or threads in use. All threads are to
    * be in DEAD state.
    */
-  mthread_thread_t t;
+  int t;
   mthread_tcb_t *tcb;
   int threads_ok = 1, conditions_ok = 1, mutexes_ok = 1, attributes_ok = 1;
 
-  for (t = (mthread_thread_t) 0; threads_ok && t < no_threads; t++) {
+  for (t = (int) 0; threads_ok && t < no_threads; t++) {
   	tcb = mthread_find_tcb(t);
   	if (tcb->m_state != MS_DEAD) threads_ok = 0;
   }
@@ -86,12 +86,12 @@ void mthread_verify_f(char *file, int line)
  *===========================================================================*/
 void mthread_stats(void)
 {
-  mthread_thread_t t;
+  int t;
   mthread_tcb_t *tcb;
   int st_run, st_dead, st_cond, st_mutex, st_exit;
   st_run = st_dead = st_cond = st_mutex = st_exit = 0;
 
-  for (t = (mthread_thread_t) 0; t < no_threads; t++) {
+  for (t = (int) 0; t < no_threads; t++) {
   	tcb = mthread_find_tcb(t);
   	switch(tcb->m_state) {
   		case MS_RUNNABLE: st_run++; break;
@@ -114,7 +114,7 @@ void mthread_stats(void)
 /*===========================================================================*
  *				mthread_stacktrace			     *
  *===========================================================================*/
-void mthread_stacktrace(mthread_thread_t t)
+void mthread_stacktrace(int t)
 {
 #ifdef __i386__ /* stacktrace only implemented on x86 */
   unsigned long bp, hbp, pc;
@@ -154,10 +154,10 @@ void mthread_stacktrace(mthread_thread_t t)
  *===========================================================================*/
 void mthread_stacktraces(void)
 {
-  mthread_thread_t t;
+  int t;
 
   mthread_stacktrace(MAIN_THREAD);
 
-  for (t = (mthread_thread_t) 0; t < no_threads; t++)
+  for (t = (int) 0; t < no_threads; t++)
 	mthread_stacktrace(t);
 }

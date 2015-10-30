@@ -7,7 +7,7 @@
  *===========================================================================*/
 void mthread_queue_add(queue, thread)
 mthread_queue_t *queue;		/* Queue we want thread to append to */
-mthread_thread_t thread;
+int thread;
 {
 /* Append a thread to the tail of the queue. As a process can be present on
  * only one queue at the same time, we can use the threads array's 'next'
@@ -60,7 +60,7 @@ mthread_queue_t *queue;
 {
   int threshold, count = 0;
   mthread_tcb_t *t;
-  mthread_thread_t tid;
+  int tid;
   threshold = no_threads;
   printf("Dumping queue: ");
 
@@ -90,11 +90,11 @@ mthread_queue_t *queue;
 /*===========================================================================*
  *				mthread_queue_remove			     *
  *===========================================================================*/
-mthread_thread_t mthread_queue_remove(queue)
+int mthread_queue_remove(queue)
 mthread_queue_t *queue;		/* Queue we want a thread from */
 {
 /* Get the first thread in this queue, if there is one. */
-  mthread_thread_t thread;
+  int thread;
   mthread_tcb_t *tcb, *random_tcb, *prev;
   int count = 0, offset_id = 0, picked_random = 0;
 

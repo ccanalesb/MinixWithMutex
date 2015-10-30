@@ -2,8 +2,8 @@
 #define __MTHREAD_PROTO_H__
 
 /* allocate.c */
-mthread_tcb_t * mthread_find_tcb(mthread_thread_t thread);
-void mthread_thread_reset(mthread_thread_t thread);
+mthread_tcb_t * mthread_find_tcb(int thread);
+void mthread_thread_reset(int thread);
 
 /* attribute.c */
 void mthread_init_valid_attributes(void);
@@ -51,15 +51,15 @@ int mthread_getcontext(ucontext_t *ctxt);
 void mthread_init_scheduler(void);
 void mthread_schedule(void);
 void mthread_suspend(mthread_state_t state);
-void mthread_unsuspend(mthread_thread_t thread);
+void mthread_unsuspend(int thread);
 
 /* queue.c */
 #ifdef MDEBUG
 void mthread_dump_queue(mthread_queue_t *queue);
 #endif
 void mthread_queue_init(mthread_queue_t *queue);
-void mthread_queue_add(mthread_queue_t *queue, mthread_thread_t thread);
-mthread_thread_t mthread_queue_remove(mthread_queue_t *queue);
+void mthread_queue_add(mthread_queue_t *queue, int thread);
+int mthread_queue_remove(mthread_queue_t *queue);
 int mthread_queue_isempty(mthread_queue_t *queue);
 
 #endif

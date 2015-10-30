@@ -53,7 +53,7 @@ mthread_mutex_t *mutex;
 {
 /* Invalidate mutex and deallocate resources. */
 
-  mthread_thread_t t;
+  int t;
   mthread_tcb_t *tcb;
 
   if (mutex == NULL)
@@ -65,7 +65,7 @@ mthread_mutex_t *mutex;
   	return(EBUSY);
 
   /* Check if this mutex is not associated with a condition */
-  for (t = (mthread_thread_t) 0; t < no_threads; t++) {
+  for (t = (int) 0; t < no_threads; t++) {
   	tcb = mthread_find_tcb(t);
 	if (tcb->m_state == MS_CONDITION) {
 		if (tcb->m_cond != NULL && tcb->m_cond->mc_mutex == *mutex) 

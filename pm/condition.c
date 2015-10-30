@@ -55,7 +55,7 @@ int mthread_cond_broadcast(cond)
 mthread_cond_t *cond;
 {
 /* Signal all threads waiting for condition 'cond'. */
-  mthread_thread_t t;
+  int t;
   mthread_tcb_t *tcb;
 
   if (cond == NULL) 
@@ -67,7 +67,7 @@ mthread_cond_t *cond;
   if (tcb->m_state == MS_CONDITION && tcb->m_cond == *cond)
   	mthread_unsuspend(MAIN_THREAD);
 
-  for (t = (mthread_thread_t) 0; t < no_threads; t++) {
+  for (t = (int) 0; t < no_threads; t++) {
   	tcb = mthread_find_tcb(t);
 	if (tcb->m_state == MS_CONDITION && tcb->m_cond == *cond) 
 		mthread_unsuspend(t);
@@ -84,7 +84,7 @@ int mthread_cond_destroy(cond)
 mthread_cond_t *cond;
 {
 /* Destroy a condition variable. Make sure it's not in use */
-  mthread_thread_t t;
+  int t;
   mthread_tcb_t *tcb;
 
   if (cond == NULL)
@@ -97,7 +97,7 @@ mthread_cond_t *cond;
   if (tcb->m_state == MS_CONDITION && tcb->m_cond == *cond)
   	return(EBUSY);
 
-  for (t = (mthread_thread_t) 0; t < no_threads; t++) {
+  for (t = (int) 0; t < no_threads; t++) {
   	tcb = mthread_find_tcb(t);
 	if (tcb->m_state == MS_CONDITION && tcb->m_cond == *cond)
 		return(EBUSY);
@@ -172,7 +172,7 @@ int mthread_cond_signal(cond)
 mthread_cond_t *cond;
 {
 /* Signal a thread that condition 'cond' was met. Just a single thread. */
-  mthread_thread_t t;
+  int t;
   mthread_tcb_t *tcb;
 
   if (cond == NULL)
@@ -184,7 +184,7 @@ mthread_cond_t *cond;
   if (tcb->m_state == MS_CONDITION && tcb->m_cond == *cond)
   	mthread_unsuspend(MAIN_THREAD);
 
-  for (t = (mthread_thread_t) 0; t < no_threads; t++) {
+  for (t = (int) 0; t < no_threads; t++) {
   	tcb = mthread_find_tcb(t);
 	if (tcb->m_state == MS_CONDITION && tcb->m_cond == *cond){
 		mthread_unsuspend(t);
