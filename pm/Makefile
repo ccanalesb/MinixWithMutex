@@ -10,7 +10,7 @@ SRCS=	main.c forkexit.c exec.c time.c alarm.c \
 	condition.c \
 	event.c \
 	key.c \
-	misc.c \
+	misc_t.c \
 	mutex.c \
 	pthread_compat.c \
 	queue.c \
