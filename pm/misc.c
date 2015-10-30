@@ -28,6 +28,7 @@
 #include "mproc.h"
 #include "kernel/proc.h"
 #include </usr/src/minix/lib/libmthread/mutex.c>
+#include </usr/src/minix/include/minix/mthread.h>
 
 
 struct utsname uts_val = {
