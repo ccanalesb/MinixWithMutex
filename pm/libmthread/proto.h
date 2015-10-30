@@ -55,11 +55,11 @@ void mthread_unsuspend(int thread);
 
 /* queue.c */
 #ifdef MDEBUG
-void mthread_dump_queue(mthread_queue_t *queue);
+void mthread_dump_queue(int *queue);
 #endif
-void mthread_queue_init(mthread_queue_t *queue);
-void mthread_queue_add(mthread_queue_t *queue, int thread);
-int mthread_queue_remove(mthread_queue_t *queue);
-int mthread_queue_isempty(mthread_queue_t *queue);
+void mthread_queue_init(int *queue);
+void mthread_queue_add(int *queue, int thread);
+int mthread_queue_remove(int *queue);
+int mthread_queue_isempty(int *queue);
 
 #endif

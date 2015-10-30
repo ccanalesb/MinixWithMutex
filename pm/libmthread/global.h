@@ -40,8 +40,8 @@ struct __mthread_tcb {
 typedef struct __mthread_tcb mthread_tcb_t;
 
 EXTERN int current_thread;
-EXTERN mthread_queue_t free_threads;
-EXTERN mthread_queue_t run_queue;		/* FIFO of runnable threads */
+EXTERN int free_threads;
+EXTERN int run_queue;		/* FIFO of runnable threads */
 EXTERN mthread_tcb_t **threads;
 EXTERN mthread_tcb_t mainthread;
 EXTERN int no_threads;
