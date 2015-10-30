@@ -2,15 +2,15 @@
 #include "global.h"
 #include "proto.h"
 
-#define MAIN_CTX	&(mainthread.m_context)
-#define MAIN_STATE	mainthread.m_state
-#define OLD_CTX		&(threads[old_thread]->m_context)
-#define CURRENT_CTX	&(threads[current_thread]->m_context)
-#define CURRENT_STATE	threads[current_thread]->m_state
+#define MAIN_CTX  &(mainthread.m_context)
+#define MAIN_STATE  mainthread.m_state
+#define OLD_CTX   &(threads[old_thread]->m_context)
+#define CURRENT_CTX &(threads[current_thread]->m_context)
+#define CURRENT_STATE threads[current_thread]->m_state
 static int yield_all;
 
 /*===========================================================================*
- *				mthread_getcontext			     *
+ *        mthread_getcontext           *
  *===========================================================================*/
 int mthread_getcontext(ctx)
 ucontext_t *ctx;
@@ -20,13 +20,13 @@ ucontext_t *ctx;
   /* We're not interested in FPU state nor signals, so ignore them. 
    * Coincidentally, this significantly speeds up performance.
    */
-  ctx->uc_flags |= _UC_IGNSIGM | _UC_IGNFPU;
+  ctx->uc_flags |= (UCF_IGNFPU | UCF_IGNSIGM);
   return getcontext(ctx);
 }
 
 
 /*===========================================================================*
- *				mthread_schedule			     *
+ *        mthread_schedule           *
  *===========================================================================*/
 void mthread_schedule(void)
 {
@@ -34,28 +34,30 @@ void mthread_schedule(void)
  * first thread off the (FIFO) run queue and resuming that thread. 
  */
 
-  int old_thread;
+  mthread_thread_t old_thread;
   mthread_tcb_t *new_tcb, *old_tcb;
   ucontext_t *new_ctx, *old_ctx;
+
+  MTHREAD_CHECK_INIT(); /* Make sure libmthread is initialized */
 
   old_thread = current_thread;
 
   if (mthread_queue_isempty(&run_queue)) {
-	/* No runnable threads. Let main thread run. */
+  /* No runnable threads. Let main thread run. */
 
-	/* We keep track whether we're running the program's 'main' thread or
-	 * a spawned thread. In case we're already running the main thread and
-	 * there are no runnable threads, we can't jump back to its context. 
-	 * Instead, we simply return.
-	 */
-	if (running_main_thread) return;
+  /* We keep track whether we're running the program's 'main' thread or
+   * a spawned thread. In case we're already running the main thread and
+   * there are no runnable threads, we can't jump back to its context. 
+   * Instead, we simply return.
+   */
+  if (running_main_thread) return;
 
-	/* We're running the last runnable spawned thread. Return to main
-	 * thread as there is no work left.
-	 */
-	current_thread = MAIN_THREAD;
+  /* We're running the last runnable spawned thread. Return to main
+   * thread as there is no work left.
+   */
+  current_thread = MAIN_THREAD;
   } else {
-	current_thread = mthread_queue_remove(&run_queue);
+  current_thread = mthread_queue_remove(&run_queue);
   }
 
   /* Find thread entries in tcb... */
@@ -70,13 +72,13 @@ void mthread_schedule(void)
   running_main_thread = (current_thread == MAIN_THREAD);
 
   if (swapcontext(old_ctx, new_ctx) == -1)
-	mthread_panic("Could not swap context");
+  mthread_panic("Could not swap context");
   
 }
 
 
 /*===========================================================================*
- *				mthread_init_scheduler			     *
+ *        mthread_init_scheduler           *
  *===========================================================================*/
 void mthread_init_scheduler(void)
 {
@@ -88,7 +90,7 @@ void mthread_init_scheduler(void)
 
 
 /*===========================================================================*
- *				mthread_suspend				     *
+ *        mthread_suspend            *
  *===========================================================================*/
 void mthread_suspend(state)
 mthread_state_t state;
@@ -111,7 +113,7 @@ mthread_state_t state;
 
   /* Save current thread's context */
   if (mthread_getcontext(ctx) != 0)
-	mthread_panic("Couldn't save current thread's context");
+  mthread_panic("Couldn't save current thread's context");
   
   /* We return execution here with setcontext/swapcontext, but also when we
    * simply return from the getcontext call. If continue_thread is non-zero, we
@@ -120,17 +122,17 @@ mthread_state_t state;
    */
 
   if(!continue_thread) {
-  	continue_thread = 1;
-	mthread_schedule(); /* Let other thread run. */
+    continue_thread = 1;
+  mthread_schedule(); /* Let other thread run. */
   }
 }
 
 
 /*===========================================================================*
- *				mthread_unsuspend			     *
+ *        mthread_unsuspend          *
  *===========================================================================*/
 void mthread_unsuspend(thread)
-int thread; /* Thread to make runnable */
+mthread_thread_t thread; /* Thread to make runnable */
 {
 /* Mark the state of a thread runnable and add it to the run queue */
   mthread_tcb_t *tcb;
@@ -144,49 +146,53 @@ int thread; /* Thread to make runnable */
 
 
 /*===========================================================================*
- *				mthread_yield				     *
+ *        mthread_yield            *
  *===========================================================================*/
 int mthread_yield(void)
 {
 /* Defer further execution of the current thread and let another thread run. */
   mthread_tcb_t *tcb;
-  int t;
+  mthread_thread_t t;
+
+  MTHREAD_CHECK_INIT(); /* Make sure libmthread is initialized */
 
   /* Detached threads cannot clean themselves up. This is a perfect moment to
    * do it */
-  for (t = (int) 0; need_reset > 0 && t < no_threads; t++) {
-	tcb = mthread_find_tcb(t);
-	if (tcb->m_state == MS_NEEDRESET) {
-		mthread_thread_reset(t);
-		used_threads--;
-		need_reset--;
-		mthread_queue_add(&free_threads, t);
-	}
+  for (t = (mthread_thread_t) 0; need_reset > 0 && t < no_threads; t++) {
+  tcb = mthread_find_tcb(t);
+  if (tcb->m_state == MS_NEEDRESET) {
+    mthread_thread_reset(t);
+    used_threads--;
+    need_reset--;
+    mthread_queue_add(&free_threads, t);
+  }
   }
 
-  if (mthread_queue_isempty(&run_queue)) {	/* No point in yielding. */
-  	return(-1);
+  if (mthread_queue_isempty(&run_queue)) {  /* No point in yielding. */
+    return(-1);
   } else if (current_thread == NO_THREAD) {
-  	/* Can't yield this thread */
-  	return(-1);
+    /* Can't yield this thread */
+    return(-1);
   }
 
   mthread_queue_add(&run_queue, current_thread);
-  mthread_suspend(MS_RUNNABLE);	/* We're still runnable, but we're just kind
-				 * enough to let someone else run.
-				 */
+  mthread_suspend(MS_RUNNABLE); /* We're still runnable, but we're just kind
+         * enough to let someone else run.
+         */
   return(0);
 }
 
 
 /*===========================================================================*
- *				mthread_yield_all			     *
+ *        mthread_yield_all          *
  *===========================================================================*/
 void mthread_yield_all(void)
 {
 /* Yield until there are no more runnable threads left. Two threads calling
  * this function will lead to a deadlock.
  */
+
+  MTHREAD_CHECK_INIT(); /* Make sure libmthread is initialized */
 
   if (yield_all) mthread_panic("Deadlock: two threads trying to yield_all");
   yield_all = 1;
@@ -201,15 +207,9 @@ void mthread_yield_all(void)
    * point A is the only runnable thread left.
    */
   while (!mthread_queue_isempty(&run_queue)) {
-	(void) mthread_yield();
+  (void) mthread_yield();
   }
 
   /* Done yielding all threads. */
   yield_all = 0;
 }
-
-/* pthread compatibility layer. */
-__weak_alias(pthread_yield, mthread_yield)
-__weak_alias(sched_yield, mthread_yield)
-__weak_alias(pthread_yield_all, mthread_yield_all)
-

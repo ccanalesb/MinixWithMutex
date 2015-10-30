@@ -4,7 +4,7 @@
 #include "proto.h"
 
 /*===========================================================================*
- *				mthread_debug_f				     *
+ *        mthread_debug_f            *
  *===========================================================================*/
 #ifdef MDEBUG
 void mthread_debug_f(const char *file, int line, const char *msg)
@@ -15,7 +15,7 @@ void mthread_debug_f(const char *file, int line, const char *msg)
 #endif
 
 /*===========================================================================*
- *				mthread_panic_f				     *
+ *        mthread_panic_f            *
  *===========================================================================*/
 #ifdef MDEBUG
 void mthread_panic_f(const char *file, int line, const char *msg)
@@ -28,8 +28,8 @@ void mthread_panic_f(const char *file, int line, const char *msg)
   printf("mthread panic (%s:%d): ", file, line);
   printf("%s", msg);
   printf("\n");
-  fflush(stdout);	/* Force debug print to screen */
-  *((int *) sf ) = 1;	/* Cause segfault to generate trace */
+  fflush(stdout); /* Force debug print to screen */
+  *((int *) sf ) = 1; /* Cause segfault to generate trace */
   exit(1);
 }
 #else
@@ -39,14 +39,14 @@ void mthread_panic_s(void)
   volatile int *sf;
 
   sf = NULL;
-  *((volatile int *) sf ) = 1;	/* Cause segfault to generate trace */
+  *((int *) sf ) = 1; /* Cause segfault to generate trace */
   exit(1);
 }
 #endif
 
 
 /*===========================================================================*
- *				mthread_verify_f			     *
+ *        mthread_verify_f           *
  *===========================================================================*/
 #ifdef MDEBUG
 void mthread_verify_f(char *file, int line)
@@ -56,13 +56,13 @@ void mthread_verify_f(char *file, int line)
    * quiescent; no mutexes, conditions, or threads in use. All threads are to
    * be in DEAD state.
    */
-  int t;
+  mthread_thread_t t;
   mthread_tcb_t *tcb;
   int threads_ok = 1, conditions_ok = 1, mutexes_ok = 1, attributes_ok = 1;
 
-  for (t = (int) 0; threads_ok && t < no_threads; t++) {
-  	tcb = mthread_find_tcb(t);
-  	if (tcb->m_state != MS_DEAD) threads_ok = 0;
+  for (t = (mthread_thread_t) 0; threads_ok && t < no_threads; t++) {
+    tcb = mthread_find_tcb(t);
+    if (tcb->m_state != MS_DEAD) threads_ok = 0;
   }
 
   conditions_ok = mthread_cond_verify();
@@ -77,87 +77,85 @@ void mthread_verify_f(char *file, int line)
   printf("\n");
 
   if(!threads_ok || !conditions_ok || !mutexes_ok)
-	mthread_panic("Library state corrupt\n");
+  mthread_panic("Library state corrupt\n");
 }
 
 
 /*===========================================================================*
- *				mthread_stats				     *
+ *        mthread_stats            *
  *===========================================================================*/
 void mthread_stats(void)
 {
-  int t;
+  mthread_thread_t t;
   mthread_tcb_t *tcb;
   int st_run, st_dead, st_cond, st_mutex, st_exit;
   st_run = st_dead = st_cond = st_mutex = st_exit = 0;
 
-  for (t = (int) 0; t < no_threads; t++) {
-  	tcb = mthread_find_tcb(t);
-  	switch(tcb->m_state) {
-  		case MS_RUNNABLE: st_run++; break;
-  		case MS_DEAD: st_dead++; break;
-  		case MS_MUTEX: st_mutex++; break;
-  		case MS_CONDITION: st_cond++; break;
-  		case MS_EXITING: st_exit++; break;
-  		default: mthread_panic("Unknown state");
-  	}
+  for (t = (mthread_thread_t) 0; t < no_threads; t++) {
+    tcb = mthread_find_tcb(t);
+    switch(tcb->m_state) {
+      case MS_RUNNABLE: st_run++; break;
+      case MS_DEAD: st_dead++; break;
+      case MS_MUTEX: st_mutex++; break;
+      case MS_CONDITION: st_cond++; break;
+      case MS_EXITING: st_exit++; break;
+      default: mthread_panic("Unknown state");
+    }
   }
 
   printf("Pool: %-5d In use: %-5d R: %-5d D: %-5d M: %-5d C: %-5d E: %-5d\n",
-  	 no_threads, used_threads, st_run, st_dead, st_mutex, st_cond,
-	 st_exit);
+     no_threads, used_threads, st_run, st_dead, st_mutex, st_cond,
+   st_exit);
 }
 
 #endif
 
 
 /*===========================================================================*
- *				mthread_stacktrace			     *
+ *        mthread_stacktrace           *
  *===========================================================================*/
-void mthread_stacktrace(int t)
+void mthread_stacktrace(mthread_thread_t t)
 {
-#ifdef __i386__ /* stacktrace only implemented on x86 */
   unsigned long bp, hbp, pc;
   mthread_tcb_t *tcb;
   ucontext_t *ctx;
-
-  tcb = mthread_find_tcb(t);
-  ctx = &tcb->m_context;
-
-  if (t != MAIN_THREAD && ctx->uc_stack.ss_size == 0)
-	return; /* no stack, no stacktrace */
+  mcontext_t *mtx;
+  struct stackframe_s *frame;
 
   printf("thread %d: ", t);
 
-  bp = _UC_MACHINE_EBP(ctx);
+  tcb = mthread_find_tcb(t);
+  ctx = &tcb->m_context;
+  mtx = &ctx->uc_mcontext;
+  frame = &mtx->mc_p_reg;
+  bp = frame->fp;
 
   while (bp) {
-	pc = ((unsigned long *) bp)[1];
-	hbp = ((unsigned long *) bp)[0];
+  pc = ((unsigned long *) bp)[1];
+  hbp = ((unsigned long *) bp)[0];
 
-	printf("0x%lx ", (unsigned long) pc);
+  printf("0x%lx ", (unsigned long) pc);
 
-	if (hbp != 0 && hbp <= bp) {
-		pc = -1;
-		printf("0x%lx ", (unsigned long) pc);
-		break;
-	}
-	bp = hbp;
+  if (hbp != 0 && hbp <= bp) {
+    pc = -1;
+    printf("0x%lx ", (unsigned long) pc);
+    break;
+  }
+  bp = hbp;
   }
 
   printf("\n");
-#endif
 }
 
 /*===========================================================================*
- *				mthread_stacktraces			     *
+ *        mthread_stacktraces          *
  *===========================================================================*/
 void mthread_stacktraces(void)
 {
-  int t;
+  mthread_thread_t t;
 
   mthread_stacktrace(MAIN_THREAD);
 
-  for (t = (int) 0; t < no_threads; t++)
-	mthread_stacktrace(t);
+  for (t = (mthread_thread_t) 0; t < no_threads; t++)
+  mthread_stacktrace(t);
 }
