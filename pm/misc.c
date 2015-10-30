@@ -27,7 +27,7 @@
 #include <assert.h>
 #include "mproc.h"
 #include "kernel/proc.h"
-#include </usr/src/minix/include/minix/mthread.h>
+#include </usr/src/minix/lib/libmthread/mutex.c>
 
 
 struct utsname uts_val = {
