@@ -12,6 +12,18 @@ static void mthread_mutex_remove(mthread_mutex_t *m);
 #endif
 
 /*===========================================================================*
+ *				mthread_init_valid_mutexes		     *
+ *===========================================================================*/
+void mthread_init_valid_mutexes(void)
+{
+#ifdef MTHREAD_STRICT
+/* Initialize list of valid mutexes */
+  vm_front = vm_rear = NULL;
+#endif
+}
+
+
+/*===========================================================================*
  *				mthread_mutex_add			     *
  *===========================================================================*/
 #ifdef MTHREAD_STRICT
@@ -30,28 +42,6 @@ mthread_mutex_t *m;
 
   (*m)->mm_next = NULL;
   vm_rear = *m;
-}
-#endif
-
-
-/*===========================================================================*
- *				mthread_mutex_remove			     *
- *===========================================================================*/
-#ifdef MTHREAD_STRICT
-static void mthread_mutex_remove(m)
-mthread_mutex_t *m;
-{
-/* Remove mutex from list of valid, initialized mutexes */
-
-  if ((*m)->mm_prev == NULL)
-  	vm_front = (*m)->mm_next;
-  else
-  	(*m)->mm_prev->mm_next = (*m)->mm_next;
-
-  if ((*m)->mm_next == NULL)
-  	vm_rear = (*m)->mm_prev;
-  else
-  	(*m)->mm_next->mm_prev = (*m)->mm_prev;
 }
 #endif
 
@@ -91,6 +81,37 @@ mthread_mutex_t *mutex;
   return(0);
 }
 
+
+/*===========================================================================*
+ *				mthread_mutex_init			     *
+ *===========================================================================*/
+int mthread_mutex_init(mutex, mattr)
+mthread_mutex_t *mutex;	/* Mutex that is to be initialized */
+mthread_mutexattr_t *mattr;	/* Mutex attribute */
+{
+/* Initialize the mutex to a known state. Attributes are not supported */
+
+  struct __mthread_mutex *m;
+
+  if (mutex == NULL)
+  	return(EAGAIN);
+  else if (mattr != NULL)
+  	return(ENOSYS);
+#ifdef MTHREAD_STRICT
+  else if (mthread_mutex_valid(mutex))
+  	return(EBUSY);
+#endif
+  else if ((m = malloc(sizeof(struct __mthread_mutex))) == NULL) 
+  	return(ENOMEM);
+
+  mthread_queue_init(&m->mm_queue);
+  m->mm_owner = NO_THREAD;
+  *mutex = (mthread_mutex_t) m;
+  mthread_mutex_add(mutex); /* Validate mutex; mutex now in use */
+
+  return(0);
+}
+
 /*===========================================================================*
  *				mthread_mutex_lock			     *
  *===========================================================================*/
@@ -121,6 +142,55 @@ mthread_mutex_t *mutex;	/* Mutex that is to be locked */
   return(0);
 }
 
+
+/*===========================================================================*
+ *				mthread_mutex_remove			     *
+ *===========================================================================*/
+#ifdef MTHREAD_STRICT
+static void mthread_mutex_remove(m)
+mthread_mutex_t *m;
+{
+/* Remove mutex from list of valid, initialized mutexes */
+
+  if ((*m)->mm_prev == NULL)
+  	vm_front = (*m)->mm_next;
+  else
+  	(*m)->mm_prev->mm_next = (*m)->mm_next;
+
+  if ((*m)->mm_next == NULL)
+  	vm_rear = (*m)->mm_prev;
+  else
+  	(*m)->mm_next->mm_prev = (*m)->mm_prev;
+}
+#endif
+
+/*===========================================================================*
+ *				mthread_mutex_trylock			     *
+ *===========================================================================*/
+int mthread_mutex_trylock(mutex)
+mthread_mutex_t *mutex;	/* Mutex that is to be locked */
+{
+/* Try to lock this mutex and return OK. If already locked, return error. */
+
+  struct __mthread_mutex *m;
+
+  if (mutex == NULL) 
+  	return(EINVAL);
+
+  m = (struct __mthread_mutex *) *mutex;
+  if (!mthread_mutex_valid(&m))
+  	return(EINVAL);
+  else if (m->mm_owner == current_thread)
+	return(EDEADLK);
+  else if (m->mm_owner == NO_THREAD) {
+	m->mm_owner = current_thread;
+	return(0);
+  } 
+
+  return(EBUSY);
+}
+
+
 /*===========================================================================*
  *				mthread_mutex_unlock			     *
  *===========================================================================*/
@@ -146,6 +216,7 @@ mthread_mutex_t *mutex;	/* Mutex that is to be unlocked */
   return(0);
 }
 
+
 /*===========================================================================*
  *				mthread_mutex_valid			     *
  *===========================================================================*/
@@ -169,3 +240,26 @@ mthread_mutex_t *m;
 }
 #endif
 
+/*===========================================================================*
+ *				mthread_mutex_verify			     *
+ *===========================================================================*/
+#ifdef MDEBUG
+int mthread_mutex_verify(void)
+{
+  /* Return true when no mutexes are in use */
+  int r = 1;
+  struct __mthread_mutex *loopitem;
+
+#ifdef MTHREAD_STRICT
+  loopitem = vm_front;
+
+  while (loopitem != NULL) {
+  	printf("mutex corruption: owner: %d\n", loopitem->mm_owner);
+	loopitem = loopitem->mm_next;
+  	r = 0;
+  }
+#endif
+
+  return(r);
+}
+#endif
