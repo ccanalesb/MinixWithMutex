@@ -6,7 +6,7 @@
  *				mthread_queue_add			     *
  *===========================================================================*/
 void mthread_queue_add(queue, thread)
-mthread_queue_t *queue;		/* Queue we want thread to append to */
+int *queue;		/* Queue we want thread to append to */
 int thread;
 {
 /* Append a thread to the tail of the queue. As a process can be present on
@@ -33,7 +33,7 @@ int thread;
  *				mthread_queue_init			     *
  *===========================================================================*/
 void mthread_queue_init(queue)
-mthread_queue_t *queue;		/* Queue that has to be initialized */
+int *queue;		/* Queue that has to be initialized */
 {
 /* Initialize queue to a known state */
 
@@ -45,7 +45,7 @@ mthread_queue_t *queue;		/* Queue that has to be initialized */
  *				mthread_queue_isempty			     *
  *===========================================================================*/
 int mthread_queue_isempty(queue)
-mthread_queue_t *queue;
+int *queue;
 {
   return(queue->mq_head == NULL);
 }
@@ -56,7 +56,7 @@ mthread_queue_t *queue;
  *===========================================================================*/
 #ifdef MDEBUG
 void mthread_dump_queue(queue)
-mthread_queue_t *queue;
+int *queue;
 {
   int threshold, count = 0;
   mthread_tcb_t *t;
@@ -91,7 +91,7 @@ mthread_queue_t *queue;
  *				mthread_queue_remove			     *
  *===========================================================================*/
 int mthread_queue_remove(queue)
-mthread_queue_t *queue;		/* Queue we want a thread from */
+int *queue;		/* Queue we want a thread from */
 {
 /* Get the first thread in this queue, if there is one. */
   int thread;
