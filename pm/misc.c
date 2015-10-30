@@ -27,6 +27,19 @@
 #include <assert.h>
 #include "mproc.h"
 #include "kernel/proc.h"
+#include <minix/mthread.h>
+#include "global.h"
+#include "proto_t.h"
+#include "mymutex.c"
+
+#ifdef MTHREAD_STRICT
+static struct __mthread_mutex *vm_front, *vm_rear;
+static void mthread_mutex_add(mthread_mutex_t *m);
+static void mthread_mutex_remove(mthread_mutex_t *m);
+#else
+# define mthread_mutex_add(m)   ((*m)->mm_magic = MTHREAD_INIT_MAGIC)
+# define mthread_mutex_remove(m)  ((*m)->mm_magic = MTHREAD_NOT_INUSE)
+#endif
 
 struct utsname uts_val = {
   OS_NAME,		/* system name */
@@ -431,13 +444,39 @@ int do_mutex_destroy()
 /*===========================================================================*
 *	Mutex_lock						*
 *===========================================================================*/
-int do_mutex_lock()
+// int do_mutex_lock()
+// {
+// 	printf("mutex lock\n");
+// 	return 0;
+
+// }
+
+int do_mutex_lock(mutex)
+mthread_mutex_t *mutex; /* Mutex that is to be locked */
 {
-	printf("mutex lock\n");
-	return 0;
+/* Try to lock this mutex. If already locked, append the current thread to
+ * FIFO queue associated with this mutex and suspend the thread. */
 
+  struct __mthread_mutex *m;
+
+  if (mutex == NULL)
+    return(EINVAL);
+
+  m = (struct __mthread_mutex *) *mutex;
+  if (!mthread_mutex_valid(&m)) 
+    return(EINVAL);
+  else if (m->mm_owner == NO_THREAD) { /* Not locked */
+  m->mm_owner = current_thread;
+  } else if (m->mm_owner == current_thread) {
+    return(EDEADLK);
+  } else {
+  mthread_queue_add(&m->mm_queue, current_thread);
+  mthread_suspend(MS_MUTEX);
+  }
+
+  /* When we get here we acquired the lock. */
+  return(0);
 }
-
 /*===========================================================================*
 *	Mutex_unlock							  *
 *===========================================================================*/
