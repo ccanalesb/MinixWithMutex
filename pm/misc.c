@@ -27,7 +27,7 @@
 #include <assert.h>
 #include "mproc.h"
 #include "kernel/proc.h"
-#include <minix/mthread.h>
+#include </usr/src/minix/include/minix/mthread.h>
 #include "global.h"
 #include "proto_t.h"
 #include "mymutex.c"

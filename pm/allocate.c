@@ -1,6 +1,6 @@
 #define ALLOCATE
 #include <errno.h>
-#include <minix/mthread.h>
+#include </usr/src/minix/include/minix/mthread.h>
 #include <string.h>
 #include <machine/param.h>
 #include <sys/mman.h>

@@ -1,4 +1,4 @@
-#include <minix/mthread.h>
+#include </usr/src/minix/include/minix/mthread.h>
 #include "global.h"
 #include "proto.h"
 
