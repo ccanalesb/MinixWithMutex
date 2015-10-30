@@ -3,7 +3,6 @@
 struct mproc;
 
 #include <minix/timers.h>
-#include "global.h"
 
 /* alarm.c */
 int do_itimer(void);
