@@ -1,6 +1,6 @@
 #include <minix/mthread.h>
 #include "global.h"
-#include "proto_t.h"
+#include "proto.h"
 
 #define MAIN_CTX	&(mainthread.m_context)
 #define MAIN_STATE	mainthread.m_state

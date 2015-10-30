@@ -1,6 +1,6 @@
 #include <minix/mthread.h>
 #include "global.h"
-#include "proto_t.h"
+#include "proto.h"
 
 static struct __mthread_attr *va_front, *va_rear;
 static void mthread_attr_add(mthread_attr_t *a);

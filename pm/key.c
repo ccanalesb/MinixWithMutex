@@ -1,7 +1,7 @@
 #include <minix/mthread.h>
 #include <string.h>
 #include "global.h"
-#include "proto_t.h"
+#include "proto.h"
 
 static int keys_used = 0;
 static struct {

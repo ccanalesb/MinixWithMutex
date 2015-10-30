@@ -11,7 +11,7 @@
 #include <uvm/uvm_param.h>
 
 #include "global.h"
-#include "proto_t.h"
+#include "proto.h"
 
 static int mthread_increase_thread_pool(void);
 static void mthread_thread_init(mthread_thread_t thread, mthread_attr_t

@@ -1,6 +1,6 @@
 #include <minix/mthread.h>
 #include "global.h"
-#include "proto_t.h"
+#include "proto.h"
 
 #ifdef MTHREAD_STRICT
 static struct __mthread_mutex *vm_front, *vm_rear;

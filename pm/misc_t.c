@@ -1,7 +1,7 @@
 #include <minix/mthread.h>
 #include <stdio.h>
 #include "global.h"
-#include "proto_t.h"
+#include "proto.h"
 
 /*===========================================================================*
  *				mthread_debug_f				     *
