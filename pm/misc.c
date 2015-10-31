@@ -416,7 +416,8 @@ int do_mycall(void)
 *===========*/
 int do_mutex_init()
 {
-  pthread_mutex_t *mutex, pthread_mutexattr_t *mattr;
+  pthread_mutex_t *mutex;
+  pthread_mutexattr_t *mattr;
   return pthread_mutex_init(mutex,mattr);
 }
 
