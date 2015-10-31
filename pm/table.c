@@ -60,7 +60,7 @@ int (* const call_vec[NR_PM_CALLS])(void) = {
 	CALL(PM_GETPROCNR)	= do_getprocnr,		/* getprocnr(2) */
 	CALL(PM_MUTEX_INIT)	= do_mutex_init,	/* init_mutex */
 	CALL(PM_MUTEX_DESTROY)	= do_mutex_destroy,	/* mutex_dest */
-	CALL(PM_MUTEX_LOCK)	= (int (*const)(void))do_mutex_lock,	/* lock mutex */
+	CALL(PM_MUTEX_LOCK)	= do_mutex_lock,	/* lock mutex */
 	CALL(PM_MUTEX_UNLOCK)	= do_mutex_unlock,	/* unlock mytex */
 	CALL(PM_GETSYSINFO)	= do_getsysinfo		/* getsysinfo(2) */
 };
