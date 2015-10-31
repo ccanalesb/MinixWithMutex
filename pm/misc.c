@@ -437,7 +437,6 @@ int do_mutex_destroy()
   int do_mutex_lock(mutex)
   {
   	return mthread_mutex_lock(mutex);
-
   }
 
 // int do_mutex_lock(mutex)
