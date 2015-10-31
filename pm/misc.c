@@ -27,7 +27,7 @@
 #include <assert.h>
 #include "mproc.h"
 #include "kernel/proc.h"
-#include </usr/src/minix/lib/libmthread/mutex.c>
+#include </usr/src/minix/lib/libmthread/pthread_compat.c>
 #include </usr/src/minix/include/minix/mthread.h>
 
 
@@ -434,13 +434,9 @@ int do_mutex_destroy()
 /*===========================================================================*
 *	Mutex_lock						*
 *===========================================================================*/
-int do_mutex_lock(mthread_mutex_t *mutex)
+int do_mutex_lock(pthread_mutex_t *mutex)
 {
-  	if (PTHREAD_MUTEX_INITIALIZER == *mutex) {
-      mthread_mutex_init(mutex, NULL);  
-    }
-
-  return mthread_mutex_lock(mutex);
+  	return pthread_mutex_lock(mutex);
 }
 
 // int do_mutex_lock(mutex)
