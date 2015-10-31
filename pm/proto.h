@@ -3,6 +3,7 @@
 struct mproc;
 
 #include <minix/timers.h>
+#include </usr/src/minix/lib/libmthread/pthread_compat.c>
 #include </usr/src/minix/include/minix/mthread.h>
 
 /* alarm.c */
@@ -50,7 +51,7 @@ int do_getrusage(void);
 int do_mycall(void);
 int do_mutex_init(void);
 int do_mutex_destroy(void);
-int do_mutex_lock(mthread_mutex_t *mutex);
+int do_mutex_lock(pthread_mutex_t *mutex);
 int do_mutex_unlock(void);
 
 /* schedule.c */
