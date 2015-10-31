@@ -434,7 +434,7 @@ int do_mutex_destroy()
 /*===========================================================================*
 *	Mutex_lock						*
 *===========================================================================*/
-int do_mutex_lock(pthread_mutex_t *mutex)
+int do_mutex_lock(const message *mutex)
 {
   	return pthread_mutex_lock(mutex);
 }
