@@ -50,7 +50,7 @@ int do_getrusage(void);
 int do_mycall(void);
 int do_mutex_init(void);
 int do_mutex_destroy(void);
-int do_mutex_lock(mthread_mutex_t mutex);
+int do_mutex_lock(mutex_t *mtx);
 int do_mutex_unlock(void);
 
 /* schedule.c */
