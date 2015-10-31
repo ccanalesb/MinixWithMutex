@@ -25,6 +25,3 @@
 #include "type.h"
 #include "proto.h"
 #include "glo.h"
-
-#include </usr/src/minix/lib/libmthread/mutex.c>
-#include </usr/src/minix/include/minix/mthread.h>
