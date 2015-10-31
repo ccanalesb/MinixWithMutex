@@ -434,7 +434,7 @@ int do_mutex_destroy()
 /*===========================================================================*
 *	Mutex_lock						*
 *===========================================================================*/
-int do_mutex_lock(pthread_mutex_t *mutex)
+int do_mutex_lock(mthread_mutex_t *mutex)
 {
   	if (PTHREAD_MUTEX_INITIALIZER == *mutex) {
       mthread_mutex_init(mutex, NULL);  
